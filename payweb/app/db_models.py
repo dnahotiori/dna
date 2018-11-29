@@ -29,9 +29,9 @@ class Func_MerchantInfo(object):
 
 merchantInfo = Table('Func_MerchantInfo', metadata,
                      Column('ID', String(36), default=getId, primary_key=True),
-                     Column('AppId', String(32), unique=True),
-                     Column('Key', String(64), unique=True),
-                     Column('Name', String(50), unique=True),
+                     Column('AppId', String(32)),
+                     Column('Key', String(64)),
+                     Column('Name', String(50)),
                      Column('CreateTime', Integer, default=getTime),
                      Column("Updated", Integer, default=getTime),
                      Column("IsDelete", Boolean, default=True)
