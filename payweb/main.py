@@ -3,7 +3,7 @@ from flask import Flask, make_response, jsonify
 from app.view import *
 from app.merchant.view import *
 from app.database import *
-from app.response import baseResponse, BaseResponse, BaseResponseSchema
+from app.response import  BaseResponse, BaseResponseSchema
 # from app.exceptionHandler.view import exception
 
 baseUrl = "/scancode/api/v1"
