@@ -19,7 +19,7 @@ init_db()
 def beforeRequest():
     print("beforeRequest")
     data = request.get_json()
-    print(data)
+    print(data) 
 
 
 @app.after_request
