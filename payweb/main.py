@@ -33,7 +33,8 @@ def afterRequest(response):
 
 @app.teardown_request
 def shutdown_session(exception=None):
-    db_session.remove()
+    #dbs.remove()
+    pass
 
 
 @app.errorhandler(404)

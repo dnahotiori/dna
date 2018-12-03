@@ -11,8 +11,8 @@ class BaseResponse():
     def ToDict(self):
         schema = BaseResponseSchema()
         return schema.dump(self)
-    # def __repr__(self):
-    #     return '<BaseResponse(name={self.name!r})>'.format(self=self)
+    def __repr__(self):
+        return '<BaseResponse(code={self.code!r})>'.format(self=self)
 
 
 class ResponseStatus():
