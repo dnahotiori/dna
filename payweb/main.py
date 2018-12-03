@@ -3,7 +3,7 @@ from flask import Flask, make_response, jsonify
 from app.view import *
 from app.merchant.view import *
 from app.database import *
-from app.response import  BaseResponse, BaseResponseSchema
+from app.response import BaseResponse,JSONResponse
 # from app.exceptionHandler.view import exception
 
 baseUrl = "/scancode/api/v1"
@@ -11,6 +11,8 @@ app = Flask(__name__)
 
 app.register_blueprint(home)
 app.register_blueprint(merchBlue, url_prefix=baseUrl+"/merchant")
+
+app.response_class = JSONResponse
 # 创建数据库
 init_db()
 
@@ -19,7 +21,7 @@ init_db()
 def beforeRequest():
     print("beforeRequest")
     data = request.get_json()
-    print(data) 
+    print(data)
 
 
 @app.after_request
@@ -36,19 +38,15 @@ def shutdown_session(exception=None):
 
 @app.errorhandler(404)
 def notFound(error):
-    rsp = BaseResponse(404, "Not Found")
-    schema = BaseResponseSchema()
-    result = schema.dump(rsp)
-    return make_response(jsonify(result.data), 404)
+    rsp = BaseResponse(404, "Not Found").ToDict()
+    return make_response(jsonify(rsp.data), 404)
 
 
 @app.errorhandler(400)
 @app.errorhandler(500)
 def internal_server_error(error):
-    rsp = BaseResponse(400, error.args[0])
-    schema = BaseResponseSchema()
-    result = schema.dump(rsp)
-    return make_response(jsonify(result.data), 400)
+    rsp = BaseResponse(400, error.args[0]).ToDict()
+    return make_response(jsonify(rsp.data), 400)
 
 
 if __name__ == "__main__":
