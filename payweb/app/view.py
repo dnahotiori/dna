@@ -5,4 +5,4 @@ home = Blueprint("home", __name__)
 
 @home.route("/")
 def Home():
-    return "home"
+    return "WebClome API"

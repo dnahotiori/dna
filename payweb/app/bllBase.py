@@ -14,9 +14,12 @@ def DbUpdate(model: "TableBase"):
     model.Updated = getTime()
 
 
-def DbDelete(model: "TableBase"):
+def DbRomve(model: "TableBase"):
     model.Updated = getTime()
     model.IsDelete = True
+
+def DbDelete(model: "TableBase"):
+    dbs.delete(model)
 
 
 def DbQuery(tableModel: "TableBase"):
