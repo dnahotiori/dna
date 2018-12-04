@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, json, redirect, abort
 from sqlalchemy import Table
-from app.database import dbs
+from app.bllBase import *
 from app.db_models import Func_MerchantInfo
 from app.merchant.DTOMerch import DTORegisteredMerchantsRequest, DTORegisteredMerchantsRequestSchema
 from app.response import BaseResponse
@@ -19,24 +19,20 @@ def beforeRequest():
 @merchBlue.route("/", methods=['POST'])
 def RegisteredMerchants():
     reqData = DTORegisteredMerchantsRequestSchema().load(request.get_json()).data
-    mmodel = dbs.query(Func_MerchantInfo).filter(
-        Func_MerchantInfo.AppId == reqData.AppId).one()
+    mmodel = DbQuery(Func_MerchantInfo).filter(
+        Func_MerchantInfo.AppId == reqData.AppId).first()
+    isAdd = False
     if mmodel == None:
+        isAdd=True
         mmodel = Func_MerchantInfo()
     mmodel.AppId = reqData.AppId
     mmodel.Key = reqData.Key
     mmodel.Name = reqData.Name
-    if mmodel == None:
-        dbs.add(mmodel)
-    dbs.commit()
-    # merchatModel = Table('Func_MerchantInfo', metadata, autoload=True)
-
-    # merchatInfo = merchatModel.select(
-    #     merchatModel.c.AppId == model.AppId).execute().first()
-    # if merchatInfo == None:
-    #     con = engine.connect()
-    #     con.execute(merchatModel.insert(), AppId=model.AppId,
-    #                 Key=model.Key, Name=model.Name)
+    if isAdd:
+        DbAdd(mmodel)
+    else:
+        DbUpdate(mmodel)
+    SaveChange()
 
     return BaseResponse()
     # return request.get_json()
