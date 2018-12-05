@@ -1,6 +1,21 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_load
 from flask import jsonify
 from werkzeug.wrappers import Response
+
+
+class APIBaseRequest():
+    def __init__(self, sign: "str", appId: "str"):
+        self.Sign = sign
+        self.AppID = appId
+
+
+class APIBaseRequestSchema(Schema):
+    Sign = fields.Str(),
+    APPID = fields.Str()
+
+    @post_load
+    def make_user(self, data):
+        return APIBaseRequestSchema(**data)
 
 
 class BaseResponse():
@@ -11,6 +26,7 @@ class BaseResponse():
     def ToDict(self):
         schema = BaseResponseSchema()
         return schema.dump(self)
+
     def __repr__(self):
         return '<BaseResponse(code={self.code!r})>'.format(self=self)
 
@@ -29,6 +45,7 @@ class ResponseStatusSchema(Schema):
 class BaseResponseSchema(Schema):
     ResponseStatus = fields.Nested(ResponseStatusSchema())
     Data = fields.Dict()
+
 
 class JSONResponse(Response):
     default_mimetype = "application/json"

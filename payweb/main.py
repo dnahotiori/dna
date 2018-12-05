@@ -47,6 +47,11 @@ def internal_server_error(error):
     rsp = BaseResponse(400, error.args[0]).ToDict()
     return make_response(jsonify(rsp.data), 400)
 
+@app.errorhandler(401)
+def unauthorized(error):
+    rsp = BaseResponse(401, "Unauthorized").ToDict()
+    return make_response(jsonify(rsp.data), 400)
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8080, debug=True)
