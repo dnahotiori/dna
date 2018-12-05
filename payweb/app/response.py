@@ -4,18 +4,25 @@ from werkzeug.wrappers import Response
 
 
 class APIBaseRequest():
-    def __init__(self, sign: "str", appId: "str"):
-        self.Sign = sign
-        self.AppID = appId
+    def __init__(self, AppId=None, Sign=None, TimeStamp: "int" = None, MchID=None):
+        self.AppId = AppId
+        self.Sign = Sign
+        self.TimeStamp = TimeStamp
+        self.MchID = MchID
+
+    def __repr__(self):
+        return '<APIBaseRequest(appid={self.AppId!r})>'.format(self=self)
 
 
 class APIBaseRequestSchema(Schema):
-    Sign = fields.Str(),
-    APPID = fields.Str()
+    AppId = fields.Str()
+    Sign = fields.Str()
+    MchID = fields.Str()
+    TimeStamp = fields.Int()
 
     @post_load
     def make_user(self, data):
-        return APIBaseRequestSchema(**data)
+        return APIBaseRequest(**data)
 
 
 class BaseResponse():
@@ -52,7 +59,7 @@ class JSONResponse(Response):
 
     @classmethod
     def force_type(cls, response, environ=None):
-        if isinstance(response, dict):
+        if isinstance(response, dict) or isinstance(response, list):
             rsp = BaseResponse(0, None, response).ToDict()
             response = jsonify(rsp.data)
         elif isinstance(response, BaseResponse):

@@ -3,7 +3,8 @@ from flask import Flask, make_response, jsonify
 from app.view import *
 from app.merchant.view import *
 from app.database import *
-from app.response import BaseResponse,JSONResponse
+from app.response import BaseResponse, JSONResponse
+from app.customError import *
 # from app.exceptionHandler.view import exception
 
 baseUrl = "/scancode/api/v1"
@@ -19,14 +20,16 @@ init_db()
 
 @app.before_request
 def beforeRequest():
-    print("Main_beforeRequest")
+    pass
+    #print("Main_beforeRequest")
 
 
 @app.after_request
 def afterRequest(response):
-    response.headers["Content-Type"] = "application/json"
-    print("after_request")
     return response
+    #response.headers["Content-Type"] = "application/json"
+    #print("after_request")
+    #return response
 
 
 @app.teardown_request
@@ -44,13 +47,18 @@ def notFound(error):
 @app.errorhandler(400)
 @app.errorhandler(500)
 def internal_server_error(error):
-    rsp = BaseResponse(400, error.args[0]).ToDict()
+    if isinstance(error, APIException):
+        rsp = BaseResponse(error.code, "%s" %
+                           (error.message)).ToDict()
+    else:
+        rsp = BaseResponse(ErrorCode.BASECODE, error.args[0]).ToDict()
     return make_response(jsonify(rsp.data), 400)
+
 
 @app.errorhandler(401)
 def unauthorized(error):
     rsp = BaseResponse(401, "Unauthorized").ToDict()
-    return make_response(jsonify(rsp.data), 400)
+    return make_response(jsonify(rsp.data), 401)
 
 
 if __name__ == "__main__":

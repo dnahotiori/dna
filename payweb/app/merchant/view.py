@@ -5,6 +5,7 @@ from app.db_models import Func_MerchantInfo
 from app.merchant.DTOMerch import DTORegisteredMerchantsRequest, DTORegisteredMerchantsRequestSchema
 from app.response import BaseResponse
 from app.requestHandler import requestValidate
+from app.customError import *
 
 merchBlue = Blueprint("merch", __name__)
 
@@ -24,14 +25,18 @@ def merchbeforeRequest():
 def RegisteredMerchants():
     reqData = DTORegisteredMerchantsRequestSchema().load(request.get_json()).data
     mmodel = DbQuery(Func_MerchantInfo).filter(
-        Func_MerchantInfo.AppId == reqData.AppId).first()
+        Func_MerchantInfo.AppId == reqData.AppId, Func_MerchantInfo.MchID == reqData.MchID).first()
     isAdd = False
     if mmodel == None:
         isAdd = True
         mmodel = Func_MerchantInfo()
+    if reqData.AppId is None or reqData.Key is None or reqData.Name is None or reqData.MchID is None:
+        raise APIException(ErrorCode.PARA_NONE,
+                           "错误的参数[AppId,Key,Name,MchID]必填")
     mmodel.AppId = reqData.AppId
     mmodel.Key = reqData.Key
     mmodel.Name = reqData.Name
+    mmodel.MchID = reqData.MchID
     if isAdd:
         DbAdd(mmodel)
     else:
@@ -39,11 +44,14 @@ def RegisteredMerchants():
     SaveChange()
 
     return BaseResponse()
-    # return request.get_json()
-    # return {"N":1,"M":"MStr"}
 
 
-@merchBlue.route("/qrcode", methods=['POST'])
-def CreateQrCode():
-    return BaseResponse()
-#     # return redirect('http://weixin.qq.com/q/02jYciEHOL9Y_1fhp9xscJ')
+@merchBlue.route("/getMerInfo", methods=['POST'])
+def getMerInfo():
+    postData = request.get_json()
+    merlist = DbQuery(Func_MerchantInfo).filter(
+        Func_MerchantInfo.AppId == postData["AppId"]).all()
+    rsp = []
+    for item in merlist:
+        rsp.append({"AppId": item.AppId,"Name": item.Name,"MchID": item.MchID})
+    return rsp
